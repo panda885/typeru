@@ -1,0 +1,71 @@
+:root {
+  --color-text: #fff;
+  --color-mistake: #ff6c6c;
+  --color-caret: #fff;
+  --color-suggestion: #474e5f;
+
+  --color-background: #1e2129;
+}
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 1px;
+  font-weight: 400;
+
+  color: var(--color-text);
+  background-color: var(--color-background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  position: relative;
+  margin: 1rem;
+}
+
+.text {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.25rem;
+}
+
+.caret {
+  font-size: 1.25rem;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: .1em;
+  height: 1.2em;
+  background-color: var(--color-caret);
+}
+
+.letter {
+  color: var(--color-suggestion);
+}
+
+.letter.correct {
+  color: var(--color-text);
+}
+
+.letter.mistake {
+  color: var(--color-mistake)
+}
+
+.letter.space {
+  color: transparent;
+}
+
+.letter.mistake.space {
+  color: var(--color-mistake);
+}
