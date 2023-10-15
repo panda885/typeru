@@ -42,9 +42,9 @@ export default {
   <div class="container">
     <div class="caret" :style="{ left: caretPosition + 'px' }" />
     <div class="text">
-        <span class="letter" v-for="(letter, index) in text" :class="{ correct: input.length > index && letter == input[index], mistake: input.length > index && letter != input[index], space: letter == ' ' }">
-          {{ letter.replace(" ", "..") }}
-        </span>
+      <span class="letter" v-for="(letter, index) in text" :class="{ correct: input.length > index && letter == input[index], mistake: input.length > index && letter != input[index], space: letter == ' ' }">
+        {{ letter.replace(" ", "..") }}
+      </span>
     </div>
   </div>
 </template>
