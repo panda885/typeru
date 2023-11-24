@@ -6,7 +6,7 @@ use std::sync::Mutex;
 #[derive(Default, Debug, serde::Serialize)]
 struct Typeru {
     text: String,
-    input: Mutex<String>,
+    input: Mutex<Vec<String>>,
 }
 
 impl Typeru {
@@ -19,16 +19,27 @@ impl Typeru {
 
     pub fn insert(&self, character: char) {
         let mut input = self.input.lock().unwrap();
-        if input.len() < self.text.len() {
-            input.push(character);
+        if character == ' ' {
+            input.push(String::from(""));
+        } else if let Some(word) = input.last_mut() {
+            word.push(character);
+        } else {
+            input.push(character.to_string());
         }
     }
 
     pub fn backspace(&self) {
-        self.input.lock().unwrap().pop();
+        let mut input = self.input.lock().unwrap();
+        if let Some(word) = input.last_mut() {
+            if word.is_empty() {
+                input.pop();
+            } else {
+                word.pop();
+            }
+        }
     }
 
-    pub fn clone_input(&self) -> String {
+    pub fn clone_input(&self) -> Vec<String> {
         self.input.lock().unwrap().clone()
     }
 }
@@ -39,13 +50,13 @@ fn get_text(state: tauri::State<Typeru>) -> String {
 }
 
 #[tauri::command]
-fn insert(character: char, state: tauri::State<Typeru>) -> String {
+fn insert(character: char, state: tauri::State<Typeru>) -> Vec<String> {
     state.insert(character);
     state.clone_input()
 }
 
 #[tauri::command]
-fn backspace(state: tauri::State<Typeru>) -> String {
+fn backspace(state: tauri::State<Typeru>) -> Vec<String> {
     state.backspace();
     state.clone_input()
 }
