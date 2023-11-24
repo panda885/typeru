@@ -19,10 +19,7 @@ struct Letter {
 
 impl Letter {
     pub fn new(character: char, status: LetterStatus) -> Self {
-        Self {
-            character,
-            status
-        }
+        Self { character, status }
     }
 
     pub fn suggestion(character: char) -> Self {
@@ -44,9 +41,9 @@ struct Typeru {
 
 impl Typeru {
     pub fn new(text: &str) -> Self {
-        let text: Vec<String> = text.split(" ").map(|str| str.to_string()).collect();
+        let text: Vec<String> = text.split(' ').map(|str| str.to_string()).collect();
         let mut input: Vec<Vec<Letter>> = vec![];
-        
+
         for word in &text {
             let mut input_word: Vec<Letter> = vec![];
             for character in word.chars() {
@@ -55,7 +52,6 @@ impl Typeru {
             input.push(input_word)
         }
 
-
         Self {
             text,
             input: Mutex::from(input),
@@ -63,11 +59,11 @@ impl Typeru {
         }
     }
 
-    pub fn insert(&self, character: char) {        
+    pub fn insert(&self, character: char) {
         let mut input = self.input.lock().unwrap();
         let input_len = input.len();
-        let cursor_word = self.cursor_word.lock().unwrap().clone();
-        let cursor_index = self.cursor_index.lock().unwrap().clone();
+        let cursor_word = *self.cursor_word.lock().unwrap();
+        let cursor_index = *self.cursor_index.lock().unwrap();
 
         let input_word = &mut input[cursor_word];
         let text_word = &self.text[cursor_word];
@@ -86,7 +82,7 @@ impl Typeru {
 
         if cursor_index >= text_word.len() {
             if cursor_word >= self.text.len() - 1 {
-                return
+                return;
             }
 
             input_word.push(Letter::mistake(character));
@@ -106,18 +102,18 @@ impl Typeru {
 
     pub fn backspace(&self) {
         let mut input = self.input.lock().unwrap();
-        let cursor_word = self.cursor_word.lock().unwrap().clone();
-        let cursor_index = self.cursor_index.lock().unwrap().clone();
+        let cursor_word = *self.cursor_word.lock().unwrap();
+        let cursor_index = *self.cursor_index.lock().unwrap();
 
         if cursor_index == 0 {
             if cursor_word == 0 {
-                return
+                return;
             }
 
             let new_word = &mut input[cursor_word - 1];
             *self.cursor_index.lock().unwrap() = new_word.len();
             *self.cursor_word.lock().unwrap() -= 1;
-            return
+            return;
         }
 
         let input_word = &mut input[cursor_word];
@@ -138,7 +134,7 @@ impl Typeru {
 
 #[tauri::command]
 fn get_cursor(state: tauri::State<Typeru>) -> usize {
-    state.cursor_word.lock().unwrap().clone()
+    *state.cursor_word.lock().unwrap()
 }
 
 #[tauri::command]
@@ -163,7 +159,9 @@ fn main() {
 
     tauri::Builder::default()
         .manage(typeru)
-        .invoke_handler(tauri::generate_handler![get_cursor, get_input, insert, backspace])
+        .invoke_handler(tauri::generate_handler![
+            get_cursor, get_input, insert, backspace
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
