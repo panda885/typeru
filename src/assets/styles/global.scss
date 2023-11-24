@@ -54,3 +54,11 @@ body {
 .letter {
   color: var(--color-text);
 }
+
+.letter.mistake {
+  color: var(--color-mistake);
+}
+
+.letter.suggestion {
+  color: var(--color-suggestion);
+}

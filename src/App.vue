@@ -4,18 +4,21 @@ import * as state from './helpers/state'
 export default {
   data() {
     return {
-      text: "",
-      input: [] as string[],
+      input: [] as state.Letter[][],
       caretX: 0,
       caretY: 0
     }
   },
   mounted() {
-    state.getText().then(text => this.text = text)
-    
-    addEventListener('keydown', this.keydown)
+    state.getInput().then(input => {
+      this.input = input
+      this.$nextTick(this.updateCaretPosition)
+    })
 
-    this.updateCaretPosition()
+    addEventListener('keydown', this.keydown)
+  },
+  unmounted() {
+    removeEventListener('keydown', this.keydown)
   },
   methods: {
     async keydown(event: KeyboardEvent) {
@@ -33,16 +36,15 @@ export default {
 
       this.$nextTick(this.updateCaretPosition)
     },
-    updateCaretPosition() {
-      const letters = document.querySelectorAll('.word')
+    async updateCaretPosition() {
+      const word = document.querySelectorAll('.word')[await state.getCursor()]
+      const letters = word.querySelectorAll('.letter:not(.suggestion)')
       if (letters.length > 0) {
         const rect = letters[letters.length - 1].getBoundingClientRect()
         this.caretX = rect.x + rect.width
         this.caretY = rect.y
       } else {
-        const text = document.querySelector('.text')
-        if (!text) return
-        const rect = text.getBoundingClientRect()
+        const rect = word.getBoundingClientRect()
         this.caretX = rect.x
         this.caretY = rect.y
       }
@@ -56,8 +58,8 @@ export default {
     <div class="caret" :style="{ left: caretX + 'px', top: caretY + 'px' }" />
     <div class="text">
       <span class="word" v-for="word in input">
-        <span class="letter" v-for="letter in word">
-          {{ letter }}
+        <span class="letter" v-for="letter in word" :class="{ [letter.status]: true }">
+          {{ letter.character }}
         </span>
       </span>
     </div>
