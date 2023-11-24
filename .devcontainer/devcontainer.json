@@ -1,0 +1,32 @@
+{
+"name": "typeru",
+"image": "mcr.microsoft.com/devcontainers/rust:bookworm",
+"features": {
+	"ghcr.io/devcontainers/features/desktop-lite:1": {
+		"version": "latest",
+		"noVncVersion": "1.2.0",
+		"password": "vscode",
+		"webPort": "6080",
+		"vncPort": "5901"
+	},
+	"ghcr.io/devcontainers-contrib/features/pnpm:2": {
+		"version": "latest"
+	}
+},
+
+"forwardPorts": [6080],
+
+"onCreateCommand": "sudo apt update && sudo apt upgrade -y && sudo apt install libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev -y",
+
+"updateContentCommand": "sudo apt update && sudo apt upgrade -y && cd /workspaces/typeru && pnpm install && cd /workspaces/typeru/src-tauri && cargo install tauri-cli",
+
+"customizations": {
+	"vscode": {
+		"extensions": [
+			"Vue.volar",
+			"rust-lang.rust-analyzer",
+			"tauri-apps.tauri-vscode"
+		]
+	}
+}
+}
