@@ -4,15 +4,21 @@ import * as state from './helpers/state'
 export default {
   data() {
     return {
-      text: "",
-      input: "",
-      caretPosition: 0,
+      input: [] as state.Letter[][],
+      caretX: 0,
+      caretY: 0
     }
   },
   mounted() {
-    state.getText().then(text => this.text = text)
-    
+    state.getInput().then(input => {
+      this.input = input
+      this.$nextTick(this.updateCaretPosition)
+    })
+
     addEventListener('keydown', this.keydown)
+  },
+  unmounted() {
+    removeEventListener('keydown', this.keydown)
   },
   methods: {
     async keydown(event: KeyboardEvent) {
@@ -28,11 +34,20 @@ export default {
         return
       }
 
-      this.$nextTick(() => {
-        this.caretPosition = [...document.querySelectorAll('.letter.correct, .letter.mistake')]
-          .map(el => el.clientWidth)
-          .reduce((a, b) => a + b, 0)
-      })
+      this.$nextTick(this.updateCaretPosition)
+    },
+    async updateCaretPosition() {
+      const word = document.querySelectorAll('.word')[await state.getCursor()]
+      const letters = word.querySelectorAll('.letter:not(.suggestion)')
+      if (letters.length > 0) {
+        const rect = letters[letters.length - 1].getBoundingClientRect()
+        this.caretX = rect.x + rect.width
+        this.caretY = rect.y
+      } else {
+        const rect = word.getBoundingClientRect()
+        this.caretX = rect.x
+        this.caretY = rect.y
+      }
     }
   }
 }
@@ -40,10 +55,12 @@ export default {
 
 <template>
   <div class="container">
-    <div class="caret" :style="{ left: caretPosition + 'px' }" />
+    <div class="caret" :style="{ left: caretX + 'px', top: caretY + 'px' }" />
     <div class="text">
-      <span class="letter" v-for="(letter, index) in text" :class="{ correct: input.length > index && letter == input[index], mistake: input.length > index && letter != input[index], space: letter == ' ' }">
-        {{ letter.replace(" ", "..") }}
+      <span class="word" v-for="word in input">
+        <span class="letter" v-for="letter in word" :class="{ [letter.status]: true }">
+          {{ letter.character }}
+        </span>
       </span>
     </div>
   </div>

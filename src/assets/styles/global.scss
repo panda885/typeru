@@ -30,7 +30,6 @@ body {
 }
 
 .container {
-  position: relative;
   margin: 1rem;
 }
 
@@ -38,6 +37,8 @@ body {
   display: flex;
   flex-direction: row;
   font-size: 1.25rem;
+  flex-wrap: wrap;
+  gap: .6rem;
 }
 
 .caret {
@@ -51,21 +52,13 @@ body {
 }
 
 .letter {
-  color: var(--color-suggestion);
-}
-
-.letter.correct {
   color: var(--color-text);
 }
 
 .letter.mistake {
-  color: var(--color-mistake)
-}
-
-.letter.space {
-  color: transparent;
-}
-
-.letter.mistake.space {
   color: var(--color-mistake);
+}
+
+.letter.suggestion {
+  color: var(--color-suggestion);
 }
